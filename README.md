@@ -48,13 +48,53 @@ https://docs.docker.com/desktop/
 
 2. Then i use the below command to download and run container for Neo4j Community edition on my docker for desktop.
 
-docker run --restart always --publish=7474:7474 --publish=7687:7687 --volume=$HOME/neo4j/data:/data neo4j:4.1.1
+`docker run --restart always --publish=7474:7474 --publish=7687:7687 --volume=$HOME/neo4j/data:/data neo4j:4.1.1`
 
 Once the container is up and running.  Go to http://localhost:7474/  from the browser, from there you can run your cypher queries and do all operations.
 
 
+We use below query to create all the nodes and relationships between those nodes. 
 
+`CREATE (alex:Person{name:"Alex",age:24})`
 
+`CREATE(bob:Person{name:"Bob",age:26})`
 
+`CREATE(semen:Person{name:"Semen",age:25})`
+
+`CREATE(lucy:Person{name:"Lucy",age:25})`
+
+`CREATE(james:Person{name:"James",age:42})`
+
+`CREATE `
+
+`(alex)-[:FRIEND_OF{fromYears:2}]->(semen)`,
+
+`(alex)-[:FRIEND_OF{fromYears:3}]->(bob)`,
+
+`(bob)-[:FRIEND_OF{fromYears:5}]->(lucy)`,
+
+`(lucy)-[:FRIEND_OF{fromYears:8}]->(james)`
+
+`CREATE (boston:City{name:"Boston"})`
+
+`CREATE (la:City{name:"Los Angeles"})`
+
+`CREATE (ny:City{name:"NewYork"})`
+
+`CREATE`
+
+`(alex)-[:STAYS_AT]->(boston)`,
+
+`(bob)-[:STAYS_AT]->(la)`,
+
+`(semen)-[:STAYS_AT]->(la)`,
+
+`(lucy)-[:STAYS_AT]->(ny)`,
+
+`(james)-[:STAYS_AT]->(ny)`
+
+Once you create these data. Run below query to get the result back or to see complete data.
+
+`MATCH (n) RETURN n`
 
 
