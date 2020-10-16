@@ -14,3 +14,4 @@ Relationship - is how each node is related to each other.  For Example  Alex is 
 
 Below is the first set of things that we want to save with persons and friendsship between them.
 
+https://github.com/SantoshGoudar/Neo4j-example/blob/main/graph.png
