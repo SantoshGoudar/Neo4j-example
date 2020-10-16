@@ -98,3 +98,9 @@ Once you create these data. Run below query to get the result back or to see com
 `MATCH (n) RETURN n`
 
 
+This will return you the data exactly as below in graph or you can even see tabalur form.
+
+![Screenshot](city.png)
+
+Now let's see some queries for finding mutual friends betwenn
+
