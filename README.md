@@ -15,6 +15,8 @@ If we want to design this in RDBMS way - we can have three tables
 2. City - with name(String), id
 3. Friends - with id, id, fromYears(int)
 
+![Screenshot](Diagram.png)
+
 if one person is friend of another we store that in Friends table with id of both persons and when retreiving we can use join query to identify all the friends of a person.
 This is fairly simple when we have two tables, but when we have huge business case this join queries become complex and time consuming. In cases like this graphdb helps us.
 In graphdb this relationship is saved exactly how we draw that in a graph topology using links(pointers) between two entities relationship.
@@ -34,6 +36,22 @@ So to achieve this there are these constructs in Neo4J.
 **Node** - is the main entity - which can have properties. For example  Person - Alex -  has name, age, leaves in some city. He has friends Bob, Semen, 
 **Relationship** - is how each node is related to each other.  For Example  Alex is friend of Bob, Semen. Alex Follows Semen on social media, Bob and Semen leaves in City Boston.
  Even relationship can have properties like - Friend Of -relationship can have  from how many years.
+
+## Cypher ##
+Cypher is a Neo4j's query langauage used to create, insert, update, retrieve data from neo4j. It follows pattern matching approach to find what you nodes, relationships from the DB you want to retrieve.
+
+Here i'm using docker desktop to run neo4j on my system, you can also download and run  community edition of neo4j on desktops for handson.
+
+1. First step is to setup docker for desktop on your systems. use the below  link they have step by step to get it installed and run it.
+
+https://docs.docker.com/desktop/
+
+2. Then i use the below command to download and run container for Neo4j Community edition on my docker for desktop.
+
+docker run --restart always --publish=7474:7474 --publish=7687:7687 --volume=$HOME/neo4j/data:/data neo4j:4.1.1
+
+Once the container is up and running.  Go to http://localhost:7474/  from the browser, from there you can run your cypher queries and do all operations.
+
 
 
 
