@@ -30,7 +30,7 @@ Or you can even add a property called "residesAt" in person node for saving whic
 
 So when we consider City as another node this is how the graph looks
 
-
+![Screenshot](city.png)
 
 So to achieve this there are these constructs in Neo4J.
 **Node** - is the main entity - which can have properties. For example  Person - Alex -  has name, age, leaves in some city. He has friends Bob, Semen, 
@@ -100,7 +100,7 @@ Once you create these data. Run below query to get the result back or to see com
 
 This will return you the data exactly as below in graph or you can even see tabalur form.
 
-
+![Screenshot](city.png)
 
 Now let's see some queries for finding mutual friends betwenn
 
