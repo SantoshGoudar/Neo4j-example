@@ -21,7 +21,7 @@ if one person is friend of another we store that in Friends table with id of bot
 This is fairly simple when we have two tables, but when we have huge business case this join queries become complex and time consuming. In cases like this graphdb helps us.
 In graphdb this relationship is saved exactly how we draw that in a graph topology using links(pointers) between two entities relationship.
 
-Below is the first set of things that we want to save with persons and friendship between them.
+**Neo4J:**  Below is the first set of things that we want to save with persons and friendship between them.
 
 ![Screenshot](graph.png)
 
@@ -57,6 +57,8 @@ We use below query to create all the nodes and relationships between those nodes
 
 `CREATE (alex:Person{name:"Alex",age:24})`
 
+`CREATE (Keenu:Person{name:"Keenu",age:24})`
+
 `CREATE(bob:Person{name:"Bob",age:26})`
 
 `CREATE(semen:Person{name:"Semen",age:25})`
@@ -67,7 +69,13 @@ We use below query to create all the nodes and relationships between those nodes
 
 `CREATE `
 
-`(alex)-[:FRIEND_OF{fromYears:2}]->(semen)`,
+`(alex)-[:FRIEND_OF{fromYears:2}]->(semen),`
+
+`(alex)-[:FRIEND_OF{fromYears:2}]->(Keenu),`
+
+`(semen)-[:FRIEND_OF{fromYears:2}]->(Keenu),`
+
+`(semen)-[:FRIEND_OF{fromYears:2}]->(bob),`
 
 `(alex)-[:FRIEND_OF{fromYears:3}]->(bob)`,
 
@@ -102,5 +110,18 @@ This will return you the data exactly as below in graph or you can even see taba
 
 ![Screenshot](city.png)
 
-Now let's see some queries for finding mutual friends betwenn
+Now let's see  query for finding mutual friends between "alex" and "semen"
+
+`MATCH (alex:Person{name:"Alex"})-[:FRIEND_OF]-(afriends:Person),(semen:Person{name:"Semen"})-[:FRIEND_OF]-(sFriends:Person)
+WHERE (alex)-[:FRIEND_OF]-(sFriends) return sFriends`
+
+It returns Keenu and Bob.
+
+Now let's see query for finding friend recommendation for "alex", here i'm searching for friends of alex's friends who are not already in alex's friend list.
+
+`MATCH (alex:Person{name:"Alex"})-[:FRIEND_OF]-(afriends:Person),(afriends:Person)-[:FRIEND_OF]-(sFriends:Person) WHERE NOT (alex)-[]-(sFriends)
+return sFriends`
+
+it returns  'lucy'
+
 
