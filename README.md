@@ -53,54 +53,35 @@ https://docs.docker.com/desktop/
 Once the container is up and running.  Go to http://localhost:7474/  from the browser, from there you can run your cypher queries and do all operations.
 
 
-We use below query to create all the nodes and relationships between those nodes. 
+We use below query to create all the nodes and relationships between those nodes. Here i'm creating directed relations, note that we cannot create relations without direction. Eventhough you create relation with direction, while querying you can traverse in both direction and you can get all nodes you need.
 
-`CREATE (alex:Person{name:"Alex",age:24})`
+```
 
-`CREATE (Keenu:Person{name:"Keenu",age:24})`
+CREATE (alex:Person{name:"Alex",age:24})
+CREATE (Keenu:Person{name:"Keenu",age:24})
+CREATE(bob:Person{name:"Bob",age:26})
+CREATE(semen:Person{name:"Semen",age:25})
+CREATE(lucy:Person{name:"Lucy",age:25})
+CREATE(james:Person{name:"James",age:42})
+CREATE
+(alex)-[:FRIEND_OF{fromYears:2}]->(semen),
+(alex)-[:FRIEND_OF{fromYears:2}]->(Keenu),
+(semen)-[:FRIEND_OF{fromYears:2}]->(Keenu),
+(semen)-[:FRIEND_OF{fromYears:2}]->(bob),
+(alex)-[:FRIEND_OF{fromYears:3}]->(bob),
+(bob)-[:FRIEND_OF{fromYears:5}]->(lucy),
+(lucy)-[:FRIEND_OF{fromYears:8}]->(james)
+CREATE (boston:City{name:"Boston"})
+CREATE (la:City{name:"Los Angeles"})
+CREATE (ny:City{name:"NewYork"})
+CREATE
+(alex)-[:STAYS_AT]->(boston),
+(bob)-[:STAYS_AT]->(la),
+(semen)-[:STAYS_AT]->(la),
+(lucy)-[:STAYS_AT]->(ny),
+(james)-[:STAYS_AT]->(ny)
 
-`CREATE(bob:Person{name:"Bob",age:26})`
-
-`CREATE(semen:Person{name:"Semen",age:25})`
-
-`CREATE(lucy:Person{name:"Lucy",age:25})`
-
-`CREATE(james:Person{name:"James",age:42})`
-
-`CREATE `
-
-`(alex)-[:FRIEND_OF{fromYears:2}]->(semen),`
-
-`(alex)-[:FRIEND_OF{fromYears:2}]->(Keenu),`
-
-`(semen)-[:FRIEND_OF{fromYears:2}]->(Keenu),`
-
-`(semen)-[:FRIEND_OF{fromYears:2}]->(bob),`
-
-`(alex)-[:FRIEND_OF{fromYears:3}]->(bob)`,
-
-`(bob)-[:FRIEND_OF{fromYears:5}]->(lucy)`,
-
-`(lucy)-[:FRIEND_OF{fromYears:8}]->(james)`
-
-`CREATE (boston:City{name:"Boston"})`
-
-`CREATE (la:City{name:"Los Angeles"})`
-
-`CREATE (ny:City{name:"NewYork"})`
-
-`CREATE`
-
-`(alex)-[:STAYS_AT]->(boston)`,
-
-`(bob)-[:STAYS_AT]->(la)`,
-
-`(semen)-[:STAYS_AT]->(la)`,
-
-`(lucy)-[:STAYS_AT]->(ny)`,
-
-`(james)-[:STAYS_AT]->(ny)`
-
+```
 Once you create these data. Run below query to get the result back or to see complete data.
 
 `MATCH (n) RETURN n`
@@ -123,5 +104,79 @@ Now let's see query for finding friend recommendation for "Alex", here i'm searc
 return sFriends`
 
 it returns  'lucy'
+
+## OGM (Object Graph Mapper) ##
+ As we have ORM tools for mapping between object models of Java and database entities. We have OGM - object graph mapping library for mapping between POJO models and graph models i.e nodes and relations. It has Session, Transaction, Transaction management and all suppport what we expect from such a library.
+This uses neo4j - java drivers to connect to the database.
+
+## Spring Data Neo4j (SDN) ##
+we have spring data support for neo4j as well. Under the hood it uses OGM -and reduces all boiler plate code required for session creation, transaction handling etc.
+And comes with all the support like @Query support, finder based on method name, sorting, paging etc.
+
+I have implemented the above usecase through Spring boot and neo4j starter.
+
+Below are my entity models 
+```
+@Data
+@NodeEntity
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Person {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+    private int age;
+    @Relationship(type = "STAYS_AT")
+    private City livesAt;
+    @Relationship(type = "FRIEND_OF")
+    private List<FriendOf> friends;
+
+}
+
+@NodeEntity
+@NoArgsConstructor
+@Data
+public class City {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+
+}
+
+@Data
+@NoArgsConstructor
+@RelationshipEntity(type = "FRIEND_OF")
+@JsonIgnoreProperties("startNode")
+public class FriendOf {
+    private int fromYears;
+
+    @StartNode
+    @EqualsAndHashCode.Exclude
+    private Person startNode;
+
+    @EndNode
+    @EqualsAndHashCode.Exclude
+    private Person endNode;
+}
+
+```
+As you can see @NodeEntity is used to mark "Person" and "City" node. @Relationship - is used to mark relationship.  @RelationshipEntity is used to mark a relationship node to save properties of relationship. It also needs @StartNode and @EndNode to mark start and end of relationship entity. Here i have marked startNode as ignored for Json serialization or deserialization to avoid infinite recursion. Otherwise Person has reference to FriendOf and FriendOf has reference to Person - it will become endless loop.
+In the annotation @Relationship - if you dont specify direction - it takes default as outgoing. So when we get or Load a person - we get only friends with out going direction. But if we want to get all friends - we need to set direction as "Undirected", but if we make that even "endNode" in relationship will cause infinite recursion while deserializing.  So Instead of that i have written a special query to get all the friends as below and using @QueryResult i'm getting my desired result.
+
+Below is the repository method for the same
+```
+@Query("MATCH (pr:Person)-[:FRIEND_OF]-(fr:Person),(pr)-[st:STAYS_AT]->(c:City) where ID(pr)=$id return ID(pr) as id, pr.name as name,pr.age as age, Collect(fr) as friends, c as livesAt")
+public PersonResponse getPersonWithAllFriends(Long id);
+ 
+```
+
+You can run the application and go to 
+
+http://localhost:8082/swagger-ui.html#/
+
+And try get all Persons, get mutual Friends or get friend Suggestion.
+
 
 
