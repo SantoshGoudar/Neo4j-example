@@ -1,0 +1,16 @@
+
+server:
+  address: 0.0.0.0
+  port: 8082
+spring:
+  profiles:
+    active: default
+  application:
+    name: neo4j-example
+  data:
+    neo4j:
+      uri: bolt://localhost:7687
+      username: neo4j
+      password: secret
+logging.level.org.neo4j.ogm.drivers.bolt.request.BoltRequest: TRACE
+logging.level.org.neo4j.ogm.drivers.embedded.request.EmbeddedRequest: TRACE
