@@ -110,14 +110,14 @@ This will return you the data exactly as below in graph or you can even see taba
 
 ![Screenshot](city.png)
 
-Now let's see  query for finding mutual friends between "alex" and "semen"
+Now let's see  query for finding mutual friends between "Alex" and "Semen"
 
 `MATCH (alex:Person{name:"Alex"})-[:FRIEND_OF]-(afriends:Person),(semen:Person{name:"Semen"})-[:FRIEND_OF]-(sFriends:Person)
 WHERE (alex)-[:FRIEND_OF]-(sFriends) return sFriends`
 
 It returns Keenu and Bob.
 
-Now let's see query for finding friend recommendation for "alex", here i'm searching for friends of alex's friends who are not already in alex's friend list.
+Now let's see query for finding friend recommendation for "Alex", here i'm searching for friends of alex's friends who are not already in alex's friend list.
 
 `MATCH (alex:Person{name:"Alex"})-[:FRIEND_OF]-(afriends:Person),(afriends:Person)-[:FRIEND_OF]-(sFriends:Person) WHERE NOT (alex)-[]-(sFriends)
 return sFriends`
